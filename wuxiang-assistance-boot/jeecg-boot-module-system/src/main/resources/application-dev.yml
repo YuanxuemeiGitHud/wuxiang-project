@@ -1,0 +1,331 @@
+server:
+  port: 44109
+  tomcat:
+    max-swallow-size: -1
+  error:
+    include-exception: true
+    include-stacktrace: ALWAYS
+    include-message: ALWAYS
+  servlet:
+    context-path: /jeecg-boot
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics,httptrace
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  mail:
+    host: smtp.163.com
+    username: jeecgos@163.com
+    password: ??
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  ## quartz定时任务,采用数据库方式
+  quartz:
+    job-store-type: jdbc
+    initialize-schema: embedded
+    #设置自动启动，默认为 true
+    auto-startup: true
+    #启动时更新己存在的Job
+    overwrite-existing-jobs: true
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: MyScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            misfireThreshold: 60000
+            clusterCheckinInterval: 10000
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+  #json 时间戳统一转换
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  jpa:
+    open-in-view: false
+  activiti:
+    check-process-definitions: false
+    #启用作业执行器
+    async-executor-activate: false
+    #启用异步执行器
+    job-executor-activate: false
+  aop:
+    proxy-target-class: true
+  #配置freemarker
+  freemarker:
+    # 设置模板后缀名
+    suffix: .ftl
+    # 设置文档类型
+    content-type: text/html
+    # 设置页面编码格式
+    charset: UTF-8
+    # 设置页面缓存
+    cache: false
+    prefer-file-system-access: false
+    # 设置ftl文件路径
+    template-loader-path:
+      - classpath:/templates
+  # 设置静态文件路径，js,css等
+  mvc:
+    static-path-pattern: /**
+  resource:
+    static-locations: classpath:/static/,classpath:/public/
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+        allow:
+      web-stat-filter:
+        enabled: true
+    dynamic:
+      druid: # 全局druid参数，绝大部分值和默认保持一致。(现已支持的参数如下,不清楚含义不要乱设置)
+        # 连接池的配置信息
+        # 初始化大小，最小，最大
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        # 配置获取连接等待超时的时间
+        maxWait: 60000
+        # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+        timeBetweenEvictionRunsMillis: 60000
+        # 配置一个连接在池中最小生存的时间，单位是毫秒
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        # 打开PSCache，并且指定每个连接上PSCache的大小
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+        filters: stat,wall,slf4j
+        # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      datasource:
+        master:
+          url: jdbc:mysql://113.16.255.12:42405/wuxiang-assistance?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: lh
+          password: lh18178007095
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          # 多数据源配置
+        adaptive:
+          url: jdbc:postgresql://113.16.255.12:45100/adaptive?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+          username: postgres
+          password: kcyliao3466
+          driver-class-name: org.postgresql.Driver
+        wuxiang-attribute:
+          url: jdbc:postgresql://113.16.255.12:43904/wxdb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+          username: postgres
+          password: postgres
+          driver-class-name: org.postgresql.Driver
+        dingtalk:
+          url: jdbc:postgresql://113.16.255.12:11029/NESIDing2SQL-Server?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+          username: postgres
+          password: lh18178007095
+          driver-class-name: org.postgresql.Driver
+  #redis 配置
+  redis:
+    database: 25
+    host: 113.16.255.12
+    lettuce:
+      pool:
+        max-active: 8   #最大连接数据库连接数,设 -1 为没有限制
+        max-idle: 8     #最大等待连接中的数量,设 0 为没有限制
+        max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
+        min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
+      shutdown-timeout: 100ms
+    password: 'lh18178007095'
+    port: 11026
+#mybatis plus 设置
+mybatis-plus:
+  mapper-locations: classpath*:org/jeecg/modules/**/xml/*Mapper.xml
+  global-config:
+    # 关闭MP3.0自带的banner
+    banner: false
+    db-config:
+      #主键类型  0:"数据库ID自增",1:"该类型为未设置主键类型", 2:"用户输入ID",3:"全局唯一ID (数字类型唯一ID)", 4:"全局唯一ID UUID",5:"字符串全局唯一ID (idWorker 的字符串表示)";
+      id-type: ASSIGN_ID
+      # 默认数据库表下划线命名
+      table-underline: true
+  configuration:
+    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 返回类型为Map,显示null对应的字段
+    call-setters-on-nulls: true
+#jeecg专用配置
+minidao:
+  base-package: org.jeecg.modules.jmreport.*
+  #DB类型（mysql | postgresql | oracle | sqlserver| other）
+  db-type: mysql
+jeecg:
+  # 本地：local\Minio：minio\阿里云：alioss
+  uploadType: minio
+  path:
+    #文件上传根目录 设置
+    upload: /opt/upFiles
+    #webapp文件路径
+    webapp: /opt/webapp
+  shiro:
+    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/cockpit/jiangnan/jnAdaptiveModule/rootListNoPage/**,/cockpit/jiangnan/jnAdaptiveLayer/getListByModule/**,/sys/dingtalkLogin
+  #阿里云oss存储和大鱼短信秘钥配置
+  oss:
+    accessKey: ??
+    secretKey: ??
+    endpoint: oss-cn-beijing.aliyuncs.com
+    bucketName: ??
+  # ElasticSearch 6设置
+  elasticsearch:
+    cluster-name: elasticsearch
+    cluster-nodes: 113.16.255.12:41300
+    check-enabled: false
+  # 表单设计器配置
+  desform:
+    # 主题颜色（仅支持 16进制颜色代码）
+    theme-color: "#1890ff"
+    # 文件、图片上传方式，可选项：qiniu（七牛云）、system（跟随系统配置）
+    upload-type: system
+    map:
+      # 配置百度地图的AK，申请地址：https://lbs.baidu.com/apiconsole/key?application=key#/home
+      baidu: ??
+  # 在线预览文件服务器地址配置
+  file-view-domain: 127.0.0.1:8012
+  # minio文件上传
+  minio:
+    minio_url: http://113.16.255.12:41202
+    minio_name: root
+    minio_pass: nesi18178007095
+    bucketName: wuxiang-assistance
+  #大屏报表参数设置
+  jmreport:
+    mode: dev
+    #数据字典是否进行saas数据隔离，自己看自己的字典
+    saas: false
+    #是否需要校验token
+    is_verify_token: true
+    #必须校验方法
+    verify_methods: remove,delete,save,add,update
+  #Wps在线文档
+  wps:
+    domain: https://wwo.wps.cn/office/
+    appid: ??
+    appsecret: ??
+  #xxl-job配置
+  xxljob:
+    enabled: false
+    adminAddresses: http://127.0.0.1:9080/xxl-job-admin
+    appname: ${spring.application.name}
+    accessToken: ''
+    address: 127.0.0.1:30007
+    ip: 127.0.0.1
+    port: 30007
+    logPath: logs/jeecg/job/jobhandler/
+    logRetentionDays: 30
+    #自定义路由配置 yml nacos database
+  route:
+    config:
+      data-id: jeecg-gateway-router
+      group: DEFAULT_GROUP
+      data-type: yml
+  #分布式锁配置
+  redisson:
+    address: 113.16.255.12:42009
+    password: lh18178007095
+    type: STANDALONE
+    enabled: true
+#cas单点登录
+cas:
+  prefixUrl: http://cas.example.org:8443/cas
+#Mybatis输出sql日志
+logging:
+  level:
+    org.jeecg.modules.system.mapper: info
+#swagger
+knife4j:
+  production: false
+  basic:
+    enable: true
+    username: jeecg
+    password: jeecg1314
+#第三方登录
+justauth:
+  enabled: true
+  type:
+    GITHUB:
+      client-id: ??
+      client-secret: ??
+      redirect-uri: http://sso.test.com:8080/jeecg-boot/sys/thirdLogin/github/callback
+    WECHAT_ENTERPRISE:
+      client-id: ??
+      client-secret: ??
+      redirect-uri: http://sso.test.com:8080/jeecg-boot/sys/thirdLogin/wechat_enterprise/callback
+      agent-id: ??
+    DINGTALK:
+      client-id: ??
+      client-secret: ??
+      redirect-uri: http://sso.test.com:8080/jeecg-boot/sys/thirdLogin/dingtalk/callback
+    WECHAT_OPEN:
+      client-id: ??
+      client-secret: ??
+      redirect-uri: http://sso.test.com:8080/jeecg-boot/sys/thirdLogin/wechat_open/callback
+  cache:
+    type: default
+    prefix: 'demo::'
+    timeout: 1h
+#第三方APP对接
+third-app:
+  enabled: false
+  type:
+    #企业微信
+    WECHAT_ENTERPRISE:
+      enabled: false
+      #CORP_ID
+      client-id: ??
+      #SECRET
+      client-secret: ??
+      #自建应用id
+      agent-id: ??
+      #自建应用秘钥（新版企微需要配置）
+      # agent-app-secret: ??
+    #钉钉
+    DINGTALK:
+      enabled: false
+      # appKey
+      client-id: ??
+      # appSecret
+      client-secret: ??
+      agent-id: ??
+    # 微宏
+    WEI_HONG:
+      base-url: http://113.16.255.12:43605
+      app-id: 1429710155506782210
+      secret: 1429710577265020930
+      private-secret: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCeoJl/LBSyWXRkxJOVMhmzGUp8GlZVosb773WJ1TuSTxQ4Gy1bSP0dfY8dyeWXzceoPtcA6Gz2lo5ULFGVkbXig5j+No74feRGzwW27PyeoNR1bffqB7zKUpMNMxCuaDwxx8hxIZE3LzYuFd5URgAn+6NGyxOVuTJHasx7N1D42fe0blyp9A8MSb5S1NlCnSYozUluXXWESfevwMhnkp8XU8rQiONy8sRZsxIQ99OZA2osp17VqZGqaMeOht3oYn/PT8aQAPGraj/LbvFHaDNZyy46V7kofKnHmdvmoShEBVVXsZidDiAEFVcFLxV9DBDS1TstWHyEqekiU0rc7nfRAgMBAAECggEAXxuvrN5DMoQME3cBfcziN84MKMipxwKoB9oVQSUGaLzdRJ6W3Uqv6ISl0JiC/je1ZBz5UGQLIPY4NCO2btVElqGMk68mnbrtqb7qkDkbZgjMGfRrVnh5K13DKYDamZeJr9c3SQ11Qf8enxchjKnD4jUwOnv8LCM0EDnqjF4oQGuOP+A1YIgJ7aibsYrppCGGeFfW/C2SuMuwwOMXEIICVfwjavtTiJXCLg3/lrUe6zKX9ESrt9y9i/J1u2SBZxff/GX7BZ5wqt7TO3Hs4G/dIWbfWi3Fb4/LT6ZHTHb1ADbOue6u9f9KUDuSQlAizDVrBPpaEM4w6I2ld4mFgx2wIQKBgQDKvUBYwIO1XldeG05XgYUFt6B+gf9HpoKWTncgZP9FBOO8AFxiaroXse1z/xm0sBv+9Mob23e4QihC6nI9ieXQPp0cdWNO5CNTgV04ZNV2J1dNPJHro1lC3vbP2TkgPonSLfEXkt4GFzbvEbglbg2/tYBKHill2ch3Qj3s6QQBzQKBgQDITLSerVkxazd9tz3HYTLzmACWGYNcYYWy/v2WbBXayD3veAIWjTxsDc79A8Bm2/foQuWJJz/Y6FmGVfbcXJo3vWC/ryk5YieZKAOsfb4Ns3m5c5UZaThV4daCYsOcCMsX5T6C3AwO7lrdfsdP+6fQ26Au1wXnE8FdaRmsT5maFQKBgFCpyZ9GQWD4/zPfE2V3j9B9heqvmD0Ov+hDodwOsw3n6yAS2K8DnbTtwvci6Txd0VW4WW2J/XEfSVuOYhOf+QLI1sPK5M8vr+p6jvdwDwoqju6ZCcnCPTKA+Zwq5jKxDy7DvqfNdG7h76Zg225xAiFjen6Cz5/JbZwdi/vlngWFAoGBAIDymMkakjQ1cQj3AcestI+LyLzY+e9sPRWKARloxf0OMolK+hUoocByd1H9q0zMyeF1x62vXfQ3SQMprn4ZA5Nk0Lc2fdSacyGvWAYhAUxywad5WIB+c60ecemIyaNXKeBdTgwSu5SVMFwt9QRx34yfB5WACiXEWxTWx5ddu2YtAoGAFv5FTMI8+pTArtXN/ikUbtkRK0yceff6qa/LDMqZQH175AIrZw7Xmki3N1X0+/he0v4a/4m+KKOJTJYpdjE19lddPZuOeuewPa62NXaBXjDx4Nv+zSUBZ46uu7SfTWtVaKoNch9PXkAx0Pc/nhpGasT7E+Kf1eaNKuthIC7hHH0=
+      public-secret: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnqCZfywUsll0ZMSTlTIZsxlKfBpWVaLG++91idU7kk8UOBstW0j9HX2PHcnll83HqD7XAOhs9paOVCxRlZG14oOY/jaO+H3kRs8Ftuz8nqDUdW336ge8ylKTDTMQrmg8McfIcSGRNy82LhXeVEYAJ/ujRssTlbkyR2rMezdQ+Nn3tG5cqfQPDEm+UtTZQp0mKM1Jbl11hEn3r8DIZ5KfF1PK0IjjcvLEWbMSEPfTmQNqLKde1amRqmjHjobd6GJ/z0/GkADxq2o/y27xR2gzWcsuOle5KHypx5nb5qEoRAVVV7GYnQ4gBBVXBS8VfQwQ0tU7LVh8hKnpIlNK3O530QIDAQAB
